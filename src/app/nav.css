@@ -1,3 +1,33 @@
-.nav-link { position: relative; }
-.nav-link::after { content: ""; position: absolute; left: 0; bottom: 18px; height: 2px; width: 100%; background: #F5A623; transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
-.nav-link:hover::after { transform: scaleX(1); }
+.nav-link {
+  position: relative;
+  display: flex;
+  padding-bottom: 4px;
+  transition: color 0.2s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, #F5A623, #E8C766, #F5A623);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  width: 100%;
+}
+
+.nav-link:hover {
+  color: #7A1F2B;
+}
+
+.nav-link:focus-visible {
+  outline: none;
+  color: #7A1F2B;
+}
