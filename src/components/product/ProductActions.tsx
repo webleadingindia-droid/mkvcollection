@@ -184,7 +184,6 @@ export default function ProductActions({
         {/* Wishlist */}
         <WishlistButton
           id={p.id}
-          size="lg"
           className="self-stretch !rounded-full border border-maroon/15 !bg-white sm:self-auto"
         />
       </div>
