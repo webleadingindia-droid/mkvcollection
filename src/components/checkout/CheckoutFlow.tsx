@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import {
@@ -45,6 +46,11 @@ function downloadBlob(blob: Blob, name: string) {
 
 export default function CheckoutFlow() {
   const { ready, cart, clearCart } = useStore();
+  // Buy Now mode: /checkout?buy=<productId>&qty=<n> -> only that product, cart stays untouched
+  const params = useSearchParams();
+  const buyId = params.get("buy");
+  const buyQty = Math.min(99, Math.max(1, parseInt(params.get("qty") ?? "1", 10) || 1));
+  const buyMode = !!buyId;
   const [step, setStep] = useState(1);
   const [info, setInfo] = useState<Info>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
@@ -65,10 +71,11 @@ export default function CheckoutFlow() {
     } catch { /* ignore */ }
   }, []);
 
-  const lines = useMemo(
-    () => cart.map((i) => ({ ...i, p: products.find((p) => p.id === i.id)! })).filter((l) => l.p),
-    [cart]
-  );
+  const lines = useMemo(() => {
+    const items = buyMode ? [{ id: buyId as string, qty: buyQty }] : cart;
+    return items.map((i) => ({ ...i, p: products.find((p) => p.id === i.id)! })).filter((l) => l.p);
+  }, [cart, buyMode, buyId, buyQty]);
+  const backHref = buyMode && lines[0] ? `/products/${lines[0].p.slug}` : "/cart";
   const hasEnquiry = lines.some((l) => l.p.isPlaceholder || l.p.price <= 0);
   const subtotal = lines.reduce((n, l) => n + l.p.price * l.qty, 0);
   const shipping = shippingFor(subtotal);
@@ -190,7 +197,7 @@ export default function CheckoutFlow() {
     try { await navigator.clipboard.writeText(UPI_ID); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* ignore */ }
   };
 
-  const finish = () => { clearCart(); window.location.href = "/"; };
+  const finish = () => { if (!buyMode) clearCart(); window.location.href = "/"; };
 
   const input = "min-h-[48px] w-full rounded-2xl border bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-marigold";
   const field = (k: keyof Info, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
@@ -222,7 +229,7 @@ export default function CheckoutFlow() {
       <section className="section min-h-[60vh]"><div className="container-x max-w-xl text-center">
         <h1 className="font-heading text-2xl font-bold text-maroon-dark">Some items are price on enquiry</h1>
         <p className="mt-3 text-sm text-charcoal/70">Online payment needs a fixed price. Please remove those items, or send your list on WhatsApp for a quote.</p>
-        <Link href="/cart" className="btn-primary mt-6">Back to cart</Link>
+        <Link href={backHref} className="btn-primary mt-6">Go back</Link>
       </div></section>
     );
   }
@@ -269,7 +276,7 @@ export default function CheckoutFlow() {
               {field("pincode", "Pincode", { inputMode: "numeric", maxLength: 6, autoComplete: "postal-code", placeholder: "6-digit pincode" })}
             </div>
             <div className="mt-7 flex items-center justify-between gap-3">
-              <Link href="/cart" className="inline-flex items-center gap-1 text-sm font-medium text-maroon hover:underline"><ArrowLeft size={14} /> Cart</Link>
+              <Link href={backHref} className="inline-flex items-center gap-1 text-sm font-medium text-maroon hover:underline"><ArrowLeft size={14} /> {buyMode ? "Product" : "Cart"}</Link>
               <button type="submit" className="btn-primary">Continue <ArrowRight size={16} /></button>
             </div>
           </form>
@@ -395,7 +402,7 @@ export default function CheckoutFlow() {
 
               <div className="mt-6 flex items-center justify-between gap-3 border-t border-maroon/10 pt-4">
                 <button type="button" onClick={() => setStep(2)} className="inline-flex items-center gap-1 text-sm font-medium text-maroon hover:underline"><ArrowLeft size={14} /> Back</button>
-                <button type="button" onClick={finish} className="text-sm font-semibold text-charcoal/60 hover:text-maroon">Done · clear cart</button>
+                <button type="button" onClick={finish} className="text-sm font-semibold text-charcoal/60 hover:text-maroon">{buyMode ? "Done" : "Done · clear cart"}</button>
               </div>
             </div>
           </div>

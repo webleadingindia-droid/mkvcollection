@@ -5,8 +5,8 @@ import { FREE_SHIPPING_THRESHOLD } from "@/config/site";
 export const metadata: Metadata = { title: "FAQ", description: "Answers about ordering, payment, shipping and gifting at MKV Collection." };
 
 const faqs: [string, string][] = [
-  ["How do I place an order?", "Tap Order on WhatsApp on any product, or add items to your enquiry cart and send the list. WhatsApp opens with your message ready. We confirm price, delivery and payment there."],
-  ["Which payment methods do you accept?", "UPI and bank transfer. Cash on delivery may be available for some locations, please confirm on WhatsApp."],
+  ["How do I place an order?", "Tap Buy Now on any product, or add items to your cart and go to checkout. Fill in your details, pay by UPI, then share the payment screenshot with us on WhatsApp."],
+  ["Which payment methods do you accept?", "UPI (GPay, PhonePe, Paytm, BHIM). Pay by scanning the QR or tapping Pay with UPI app at checkout."],
   ["Are the magnets really handmade?", "Yes. Each piece is sculpted and painted by hand, so small variations are natural and part of the charm."],
   ["How long does delivery take?", "Delivery time depends on your location. We share an estimate when you confirm your order on WhatsApp."],
   ["Is shipping free?", `Shipping is free on orders above ₹${FREE_SHIPPING_THRESHOLD}. Below that, we confirm the charge on WhatsApp.`],

@@ -7,7 +7,7 @@ import {
   MessageCircle,
   Plus,
   ShoppingBag,
-  Sparkles,
+  Zap,
   ArrowRight,
 } from "lucide-react";
 import { Product, formatPrice } from "@/data/products";
@@ -34,6 +34,8 @@ export default function ProductActions({
     };
   }, []);
 
+  const canBuy = !p.isPlaceholder && p.price > 0;
+  const buyHref = `/checkout?buy=${p.id}&qty=${qty}`;
   const total = p.price > 0 ? ` (Total: ₹${p.price * qty})` : "";
   const msg = `Hello MKV Collection 🙏\nI would like to order / enquire about this product:\nProduct: ${p.title}\nProduct ID: ${p.id}\nQuantity: ${qty}\nPrice: ${formatPrice(p)}${total}\nLink: ${SITE_URL}/products/${p.slug}\n📍 Delivery city / pincode: `;
 
@@ -78,15 +80,22 @@ export default function ProductActions({
           </button>
         </div>
 
-        <a
-          href={buildWhatsAppLink(msg)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-wa flex-1 !px-3 !py-2.5 !text-xs"
-        >
-          <MessageCircle size={15} />
-          Order
-        </a>
+        {canBuy ? (
+          <Link href={buyHref} className="btn-primary flex-1 !px-3 !py-2.5 !text-xs">
+            <Zap size={15} />
+            Buy Now
+          </Link>
+        ) : (
+          <a
+            href={buildWhatsAppLink(msg)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-wa flex-1 !px-3 !py-2.5 !text-xs"
+          >
+            <MessageCircle size={15} />
+            Enquire
+          </a>
+        )}
 
         <button
           type="button"
@@ -160,20 +169,26 @@ export default function ProductActions({
 
         {/* ─── CTA Buttons (Wishlist REMOVED from here) ─── */}
         <div className="flex flex-col gap-2.5 sm:flex-row">
-          {/* WhatsApp — primary */}
-          <a
-            href={buildWhatsAppLink(msg)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(37,211,102,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-8px_rgba(37,211,102,0.6)] hover:brightness-105 active:scale-[0.98]"
-          >
-            <MessageCircle size={17} />
-            <span>Order on WhatsApp</span>
-            <Sparkles
-              size={13}
-              className="absolute right-3 top-2 opacity-0 transition group-hover:opacity-100"
-            />
-          </a>
+          {/* Buy Now — primary (direct checkout) */}
+          {canBuy ? (
+            <Link
+              href={buyHref}
+              className="group relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-maroon px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(122,31,43,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-maroon-dark hover:shadow-[0_14px_32px_-8px_rgba(122,31,43,0.6)] active:scale-[0.98]"
+            >
+              <Zap size={17} />
+              <span>Buy Now</span>
+            </Link>
+          ) : (
+            <a
+              href={buildWhatsAppLink(msg)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
+            >
+              <MessageCircle size={17} />
+              <span>Enquire on WhatsApp</span>
+            </a>
+          )}
 
           {/* Add to cart — secondary */}
           <button
@@ -205,7 +220,7 @@ export default function ProductActions({
         {/* Trust helper */}
         <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-charcoal/50">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-marigold" />
-          No prepayment · Cash on delivery available
+          Secure UPI payment · Order updates on WhatsApp
         </p>
       </div>
 

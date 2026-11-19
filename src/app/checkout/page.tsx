@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import CheckoutFlow from "@/components/checkout/CheckoutFlow";
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutPage() {
-  return <CheckoutFlow />;
+  return (
+    <Suspense fallback={null}>
+      <CheckoutFlow />
+    </Suspense>
+  );
 }

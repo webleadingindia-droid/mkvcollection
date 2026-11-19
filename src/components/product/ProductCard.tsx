@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle, Star, Eye, ShoppingBag } from "lucide-react";
+import { MessageCircle, Star, Eye, Zap } from "lucide-react";
 import { Product, discountPct, formatPrice } from "@/data/products";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SITE_URL } from "@/config/site";
@@ -8,6 +8,7 @@ import WishlistButton from "./WishlistButton";
 
 export default function ProductCard({ product: p }: { product: Product }) {
   const off = discountPct(p);
+  const canBuy = !p.isPlaceholder && p.price > 0;
   const msg = `Hello MKV Collection 🙏\nI would like to order / enquire about this product:\nProduct: ${p.title}\nProduct ID: ${p.id}\nQuantity: 1\nPrice: ${formatPrice(p)}\nLink: ${SITE_URL}/products/${p.slug}\n📍 Location: not shared`;
 
   return (
@@ -106,16 +107,26 @@ export default function ProductCard({ product: p }: { product: Product }) {
           ID: {p.id}
         </span>
 
-        {/* ─── Buy Now — mobile-first ─── */}
-        <a
-          href={buildWhatsAppLink(msg)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/btn relative mt-3 flex items-center justify-center gap-1.5 overflow-hidden rounded-full bg-[#25D366] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_4px_14px_-4px_rgba(37,211,102,0.5)] transition-all duration-200 hover:shadow-[0_6px_20px_-4px_rgba(37,211,102,0.6)] hover:brightness-105 active:scale-[0.97] md:mt-4 md:gap-2 md:py-3 md:text-sm"
-        >
-          <MessageCircle size={14} className="md:h-4 md:w-4" />
-          <span>Buy Now</span>
-        </a>
+        {/* ─── Buy Now → direct checkout (enquiry-only items stay on WhatsApp) ─── */}
+        {canBuy ? (
+          <Link
+            href={`/checkout?buy=${p.id}&qty=1`}
+            className="group/btn relative mt-3 flex items-center justify-center gap-1.5 overflow-hidden rounded-full bg-[#25D366] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_4px_14px_-4px_rgba(122,31,43,0.5)] transition-all duration-200 hover:bg-maroon-dark hover:shadow-[0_6px_20px_-4px_rgba(122,31,43,0.6)] active:scale-[0.97] md:mt-4 md:gap-2 md:py-3 md:text-sm"
+          >
+            <Zap size={14} className="md:h-4 md:w-4" />
+            <span>Buy Now</span>
+          </Link>
+        ) : (
+          <a
+            href={buildWhatsAppLink(msg)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2.5 text-xs font-semibold text-white transition hover:brightness-105 active:scale-[0.97] md:mt-4 md:gap-2 md:py-3 md:text-sm"
+          >
+            <MessageCircle size={14} className="md:h-4 md:w-4" />
+            <span>Enquire on WhatsApp</span>
+          </a>
+        )}
       </div>
     </article>
   );
