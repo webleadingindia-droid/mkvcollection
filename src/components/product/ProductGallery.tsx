@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import SafeImage from "@/components/ui/SafeImage";
-import { localProductImage } from "@/data/images";
 
 export default function ProductGallery({
   id,
@@ -21,7 +20,7 @@ export default function ProductGallery({
   const thumbStripRef = useRef<HTMLDivElement>(null);
   const total = images.length;
 
-  const main = active === 0 ? localProductImage(id) : images[active];
+  const main = images[active];
 
   const go = useCallback(
     (dir: 1 | -1) => {

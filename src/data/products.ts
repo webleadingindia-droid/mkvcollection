@@ -1,4 +1,4 @@
-import { productImages } from "./images";
+import { PRODUCT_IMAGE_URLS } from "./product-image-urls";
 
 export type Product = {
   id: string; slug: string; title: string; shortTitle: string;
@@ -49,7 +49,8 @@ function build(r: Raw, i: number): Product {
       { label: "Material", value: "Resin & polymer clay" }, { label: "Finish", value: "Handcrafted" },
       { label: "Use", value: "Fridge / metal surfaces" }, { label: "Size", value: "Miniature" },
     ],
-    images: productImages(id), inStock: true, tags,
+    images: PRODUCT_IMAGE_URLS[id] ?? [],  // ✅ URL FROM MAP
+    inStock: true, tags,
     rating: Math.round((4.3 + ((i * 7) % 6) / 10) * 10) / 10, reviewCount: 24 + ((i * 37) % 160),
     isBestseller: tags.includes("Bestseller"), isNew: tags.includes("New"), isGiftable: tags.includes("Giftable"),
     isPlaceholder: false,

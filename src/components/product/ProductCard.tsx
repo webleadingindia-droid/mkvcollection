@@ -20,10 +20,10 @@ export default function ProductCard({ product: p }: { product: Product }) {
         aria-label={p.title}
       >
         <SafeImage
-          src={localProductImage(p.id)}
-          fallback={p.images[0]}
+          src={p.images[0] ?? ""}
+          fallback={p.images[1] ?? p.images[0] ?? ""}
           alt={p.shortTitle}
-          className="transition duration-500 group-hover:scale-105 group-hover:opacity-0"
+          className="..."
         />
         <SafeImage
           src={p.images[1]}
