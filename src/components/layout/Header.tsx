@@ -103,17 +103,17 @@ export default function Header() {
             <Menu size={20} />
           </button>
 
-          {/* Logo — bigger on desktop */}
+          {/* Logo — Full text on all devices */}
           <Link
             href="/"
-            className="group flex items-center gap-2 lg:gap-2.5"
+            className="group flex items-center gap-1.5 lg:gap-2.5"
             aria-label={`${BRAND_NAME} home`}
           >
-            <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-maroon to-maroon-dark font-heading text-[11px] font-bold text-marigold shadow-sm ring-1 ring-maroon/10 transition-transform duration-300 group-hover:scale-105 lg:h-10 lg:w-10 lg:text-xs">
+            <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-maroon to-maroon-dark font-heading text-[10px] font-bold text-marigold shadow-sm ring-1 ring-maroon/10 transition-transform duration-300 group-hover:scale-105 lg:h-10 lg:w-10 lg:text-xs">
               <span className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               MKV
             </span>
-            <span className="hidden font-heading text-lg font-bold leading-none text-maroon sm:block lg:text-xl">
+            <span className="font-heading text-[15px] font-bold leading-none text-maroon sm:text-lg lg:text-xl">
               Collection
             </span>
           </Link>
