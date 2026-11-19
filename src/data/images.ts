@@ -58,9 +58,9 @@ export const images = {
   ],
 
   // ============ MISC SECTIONS ============
-  brandStory: "https://picsum.photos/seed/mkv-story/900/1000",
-  about:      "https://picsum.photos/seed/mkv-about/1600/800",
-  maker:      "https://picsum.photos/seed/mkv-maker/800/900",
+  brandStory: "https://images.meesho.com/images/products/1048597788/oxjl6.jpg",
+  about:      "https://images.meesho.com/images/products/1048683658/8tsee.jpg",
+  maker:      "https://images.meesho.com/images/products/1048689571/459ds.jpg",
 } as const;
 
 // ============ PRODUCTS ============
