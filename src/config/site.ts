@@ -21,7 +21,7 @@ export const NAV_LINKS = [
 
 // ---------- Payment (UPI) ----------
 // Apni asli UPI ID yahan daalo ya .env.local me NEXT_PUBLIC_UPI_ID set karo.
-export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID ?? "yourupiid@bank";
+export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID ?? "76790100013426@BARB0VJPITA.ifsc.npci";
 export const UPI_PAYEE_NAME = process.env.NEXT_PUBLIC_UPI_NAME ?? BRAND_NAME;
 // Shipping fee agar FREE_SHIPPING_THRESHOLD se kam ka order ho. 0 = hamesha free.
 export const SHIPPING_FEE = Number(process.env.NEXT_PUBLIC_SHIPPING_FEE ?? 0);
