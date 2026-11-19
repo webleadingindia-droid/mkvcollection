@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { Minus, MessageCircle, Plus, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
+import { Minus, MessageCircle, Plus, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, CreditCard } from "lucide-react";
 import SafeImage from "@/components/ui/SafeImage";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { products, formatPrice } from "@/data/products";
-import { FREE_SHIPPING_THRESHOLD } from "@/config/site";
+import { FREE_SHIPPING_THRESHOLD, shippingFor } from "@/config/site";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { useStore } from "@/lib/store";
 
@@ -38,8 +38,8 @@ export default function CartPage() {
       <div className="container-x max-w-4xl">
         <SectionHeading
           eyebrow="Your picks"
-          title="Enquiry cart"
-          subtitle="Send your list on WhatsApp. We confirm price, shipping and payment there."
+          title="Your cart"
+          subtitle="Pay securely via UPI, or send your list on WhatsApp."
         />
 
         {!ready ? (
@@ -170,7 +170,7 @@ export default function CartPage() {
                   <div className="flex items-center justify-between text-charcoal/70">
                     <span>Shipping</span>
                     <span className="text-green-700">
-                      {left > 0 ? `₹${FREE_SHIPPING_THRESHOLD}` : "Free"}
+                      {shippingFor(subtotal) > 0 ? `₹${shippingFor(subtotal)}` : "Free"}
                     </span>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ export default function CartPage() {
                     Total
                   </span>
                   <span className="text-xl font-bold tracking-tight text-maroon sm:text-2xl">
-                    ₹{subtotal}
+                    ₹{subtotal + shippingFor(subtotal)}
                     {hasEnquiry && " +"}
                   </span>
                 </div>
@@ -206,21 +206,31 @@ export default function CartPage() {
                   </p>
                 )}
 
+                {!hasEnquiry && (
+                  <Link
+                    href="/checkout"
+                    className="btn-primary mt-5 w-full"
+                  >
+                    <CreditCard size={17} />
+                    Proceed to checkout
+                  </Link>
+                )}
+
                 <a
                   href={buildWhatsAppLink(msg)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-[0_6px_16px_-6px_rgba(37,211,102,0.5)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-6px_rgba(37,211,102,0.6)] hover:brightness-105 active:scale-[0.98]"
+                  className={`${hasEnquiry ? "mt-5 bg-[#25D366] text-white" : "mt-3 border border-[#25D366] text-[#128C4A]"} flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-all duration-200 hover:brightness-105 active:scale-[0.98]`}
                 >
                   <MessageCircle size={17} />
-                  Send order on WhatsApp
+                  {hasEnquiry ? "Send enquiry on WhatsApp" : "Or order via WhatsApp"}
                 </a>
 
                 <div className="mt-4 flex items-start gap-2 rounded-lg bg-ivory/80 p-3 text-[10px] leading-snug text-charcoal/60">
                   <ShieldCheck size={14} className="mt-0.5 shrink-0 text-maroon/60" />
                   <p>
-                    No online payment on this site. Pay via UPI / bank transfer
-                    after we confirm on WhatsApp.
+                    Pay by UPI at checkout. After paying, share the payment
+                    screenshot with us on WhatsApp.
                   </p>
                 </div>
 

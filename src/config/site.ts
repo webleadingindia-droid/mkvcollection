@@ -18,3 +18,11 @@ export const NAV_LINKS = [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
+
+// ---------- Payment (UPI) ----------
+// Apni asli UPI ID yahan daalo ya .env.local me NEXT_PUBLIC_UPI_ID set karo.
+export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID ?? "yourupiid@bank";
+export const UPI_PAYEE_NAME = process.env.NEXT_PUBLIC_UPI_NAME ?? BRAND_NAME;
+// Shipping fee agar FREE_SHIPPING_THRESHOLD se kam ka order ho. 0 = hamesha free.
+export const SHIPPING_FEE = Number(process.env.NEXT_PUBLIC_SHIPPING_FEE ?? 0);
+export const shippingFor = (subtotal: number) => (subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE);
