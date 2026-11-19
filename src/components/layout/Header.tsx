@@ -79,7 +79,7 @@ export default function Header() {
 
   return (
     <>
-      {/* ═══════ COMPACT HEADER ═══════ */}
+      {/* ═══════ HEADER ═══════ */}
       <header
         className={`sticky top-0 z-40 transition-all duration-300 ease-out ${
           scrolled
@@ -92,7 +92,7 @@ export default function Header() {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-marigold/40 to-transparent"
         />
 
-        <div className="container-x flex h-12 items-center justify-between gap-2 md:h-16">
+        <div className="container-x flex h-12 items-center justify-between gap-2 md:h-16 lg:h-20">
           {/* Mobile Menu */}
           <button
             className={`${iconBtn} -ml-1.5 lg:hidden`}
@@ -103,24 +103,24 @@ export default function Header() {
             <Menu size={20} />
           </button>
 
-          {/* Logo — smaller */}
+          {/* Logo — bigger on desktop */}
           <Link
             href="/"
-            className="group flex items-center gap-2"
+            className="group flex items-center gap-2 lg:gap-2.5"
             aria-label={`${BRAND_NAME} home`}
           >
-            <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-maroon to-maroon-dark font-heading text-[11px] font-bold text-marigold shadow-sm ring-1 ring-maroon/10 transition-transform duration-300 group-hover:scale-105">
+            <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-maroon to-maroon-dark font-heading text-[11px] font-bold text-marigold shadow-sm ring-1 ring-maroon/10 transition-transform duration-300 group-hover:scale-105 lg:h-10 lg:w-10 lg:text-xs">
               <span className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               MKV
             </span>
-            <span className="hidden font-heading text-lg font-bold leading-none text-maroon sm:block">
+            <span className="hidden font-heading text-lg font-bold leading-none text-maroon sm:block lg:text-xl">
               Collection
             </span>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav — Bigger & More Premium */}
           <nav
-            className="hidden items-center gap-0.5 lg:flex"
+            className="hidden items-center gap-1 lg:flex lg:gap-1.5"
             aria-label="Primary"
           >
             {NAV_LINKS.map((l) => {
@@ -137,7 +137,7 @@ export default function Header() {
                       href={l.href}
                       aria-expanded={shopOpen}
                       aria-haspopup="true"
-                      className={`relative flex items-center gap-0.5 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ease-out ${
+                      className={`relative flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ease-out lg:px-5 lg:py-2.5 lg:text-[15px] ${
                         active || shopOpen
                           ? "bg-maroon/5 text-maroon"
                           : "text-charcoal/80 hover:bg-maroon/5 hover:text-maroon"
@@ -145,57 +145,57 @@ export default function Header() {
                     >
                       Shop
                       <ChevronRight
-                        size={12}
-                        className={`transition-transform duration-300 ${
+                        size={14}
+                        className={`transition-transform duration-300 lg:h-[15px] lg:w-[15px] ${
                           shopOpen ? "rotate-90" : ""
                         }`}
                       />
                     </Link>
 
-                    {/* Mega Menu — slightly tighter */}
+                    {/* Mega Menu — slightly larger */}
                     <div
-                      className={`absolute left-1/2 top-full w-[min(90vw,720px)] -translate-x-1/2 pt-2 transition-all duration-200 ease-out ${
+                      className={`absolute left-1/2 top-full w-[min(90vw,840px)] -translate-x-1/2 pt-2 transition-all duration-200 ease-out ${
                         shopOpen
                           ? "visible translate-y-0 opacity-100"
                           : "invisible translate-y-1 opacity-0"
                       }`}
                     >
                       <div className="overflow-hidden rounded-2xl border border-maroon/10 bg-ivory/90 shadow-[0_20px_60px_-16px_rgba(122,31,43,0.2)] backdrop-blur-xl backdrop-saturate-150">
-                        <div className="flex items-center justify-between border-b border-maroon/8 px-4 py-2.5">
-                          <div className="flex items-center gap-1.5">
-                            <Sparkles size={12} className="text-marigold" />
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-maroon/70">
-                              Explore
+                        <div className="flex items-center justify-between border-b border-maroon/8 px-5 py-3">
+                          <div className="flex items-center gap-2">
+                            <Sparkles size={14} className="text-marigold" />
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-maroon/70">
+                              Explore Collections
                             </p>
                           </div>
                           <Link
                             href="/shop"
-                            className="group/link inline-flex items-center gap-0.5 text-[11px] font-medium text-maroon hover:underline"
+                            className="group/link inline-flex items-center gap-1 text-xs font-medium text-maroon hover:underline"
                           >
                             View all
                             <ArrowUpRight
-                              size={11}
+                              size={13}
                               className="transition group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
                             />
                           </Link>
                         </div>
 
-                        <div className="grid grid-cols-5 gap-1.5 p-3">
+                        <div className="grid grid-cols-5 gap-2 p-4">
                           {categories.map((c) => (
                             <Link
                               key={c.slug}
                               href={`/shop/${c.slug}`}
-                              className="group/c flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-maroon/5"
+                              className="group/c flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-maroon/5"
                             >
                               <div className="relative aspect-square w-full overflow-hidden rounded-lg ring-1 ring-maroon/8 transition-all duration-300 group-hover/c:ring-2 group-hover/c:ring-marigold/40">
                                 <SafeImage
                                   src={images.categories[c.slug]}
                                   alt={c.name}
-                                  sizes="120px"
+                                  sizes="140px"
                                   className="transition duration-500 group-hover/c:scale-110"
                                 />
                               </div>
-                              <span className="text-center text-[11px] font-semibold leading-tight text-charcoal transition group-hover/c:text-maroon">
+                              <span className="text-center text-xs font-semibold leading-tight text-charcoal transition group-hover/c:text-maroon">
                                 {c.name}
                               </span>
                             </Link>
@@ -211,7 +211,7 @@ export default function Header() {
                   key={l.href}
                   href={l.href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ease-out ${
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ease-out lg:px-5 lg:py-2.5 lg:text-[15px] ${
                     active
                       ? "bg-maroon/5 text-maroon"
                       : "text-charcoal/80 hover:bg-maroon/5 hover:text-maroon"
@@ -223,40 +223,40 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-0.5 md:gap-1">
+          {/* Right actions — bigger icons on desktop */}
+          <div className="flex items-center gap-0.5 md:gap-1 lg:gap-1.5">
             <Link href="/shop" className={iconBtn} aria-label="Search products">
-              <Search size={18} />
+              <Search size={18} className="lg:h-5 lg:w-5" />
             </Link>
             <Link
               href="/wishlist"
               className={`${iconBtn} hidden sm:flex`}
               aria-label="Wishlist"
             >
-              <Heart size={18} />
+              <Heart size={18} className="lg:h-5 lg:w-5" />
               <CountBadge kind="wishlist" />
             </Link>
             <Link href="/cart" className={iconBtn} aria-label="Enquiry cart">
-              <ShoppingBag size={18} />
+              <ShoppingBag size={18} className="lg:h-5 lg:w-5" />
               <CountBadge kind="cart" />
             </Link>
 
-            <span className="mx-1 hidden h-5 w-px bg-maroon/10 md:block" />
+            <span className="mx-1 hidden h-5 w-px bg-maroon/10 md:block lg:mx-1.5 lg:h-6" />
 
             <a
               href={buildWhatsAppLink("Hello MKV Collection 🙏")}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-wa hidden !px-3 !py-1.5 !text-[13px] lg:inline-flex"
+              className="btn-wa hidden !px-4 !py-2 !text-sm lg:inline-flex"
             >
-              <MessageCircle size={14} />
+              <MessageCircle size={16} />
               <span>WhatsApp</span>
             </a>
           </div>
         </div>
       </header>
 
-      {/* ═══════ COMPACT SMOOTH SIDEBAR ═══════ */}
+      {/* ═══════ MOBILE SIDEBAR (unchanged — compact) ═══════ */}
       {drawer && (
         <div
           className="fixed inset-0 z-50 lg:hidden"
@@ -273,12 +273,10 @@ export default function Header() {
             ref={drawerRef}
             className="absolute left-0 top-0 flex h-full w-[85%] max-w-xs animate-[slideIn_320ms_cubic-bezier(0.16,1,0.3,1)] flex-col overflow-hidden"
           >
-            {/* Glass bg */}
             <div className="absolute inset-0 bg-gradient-to-b from-cream/95 via-ivory/95 to-peach/20 backdrop-blur-xl backdrop-saturate-150" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,166,35,0.12),transparent_45%)]" />
 
             <div className="relative flex h-full flex-col">
-              {/* Header — compact */}
               <div className="flex items-center justify-between border-b border-maroon/10 px-4 py-3">
                 <Link
                   href="/"
@@ -307,7 +305,6 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Search — compact */}
               <div className="px-4 pt-3 pb-2">
                 <Link
                   href="/shop"
@@ -319,7 +316,6 @@ export default function Header() {
                 </Link>
               </div>
 
-              {/* Nav — compact */}
               <nav
                 className="flex-1 overflow-y-auto px-4 py-1.5"
                 aria-label="Mobile"
@@ -401,7 +397,6 @@ export default function Header() {
                 <div className="h-4" />
               </nav>
 
-              {/* Footer CTA — compact */}
               <div className="relative border-t border-maroon/10 bg-white/50 p-3 backdrop-blur-xl">
                 <a
                   href={buildWhatsAppLink("Hello MKV Collection 🙏")}
@@ -421,91 +416,88 @@ export default function Header() {
         </div>
       )}
 
-      {/* ═══════ COMPACT SMOOTH BOTTOM NAVBAR ═══════ */}
+      {/* ═══════ MOBILE BOTTOM NAVBAR (unchanged) ═══════ */}
       {!hideBottomNav && (
-        <>
-          <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 md:hidden">
-            <nav
-              aria-label="Mobile quick actions"
-              className="relative flex w-full max-w-sm items-center justify-around gap-0.5 overflow-hidden rounded-xl border border-white/40 bg-gradient-to-b from-ivory/90 via-ivory/80 to-cream/70 p-1 shadow-[0_-4px_24px_-8px_rgba(122,31,43,0.22),0_2px_12px_-4px_rgba(122,31,43,0.12)] backdrop-blur-xl backdrop-saturate-150"
+        <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 md:hidden">
+          <nav
+            aria-label="Mobile quick actions"
+            className="relative flex w-full max-w-sm items-center justify-around gap-0.5 overflow-hidden rounded-xl border border-white/40 bg-gradient-to-b from-ivory/90 via-ivory/80 to-cream/70 p-1 shadow-[0_-4px_24px_-8px_rgba(122,31,43,0.22),0_2px_12px_-4px_rgba(122,31,43,0.12)] backdrop-blur-xl backdrop-saturate-150"
+          >
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"
+            />
+
+            {[
+              {
+                href: "/",
+                icon: Home,
+                label: "Home",
+                isActive: pathname === "/",
+              },
+              {
+                href: "/shop",
+                icon: Search,
+                label: "Shop",
+                isActive: pathname.startsWith("/shop"),
+              },
+              {
+                href: "/wishlist",
+                icon: Heart,
+                label: "Wishlist",
+                isActive: pathname === "/wishlist",
+                badge: "wishlist" as const,
+              },
+              {
+                href: "/cart",
+                icon: ShoppingBag,
+                label: "Cart",
+                isActive: pathname === "/cart",
+                badge: "cart" as const,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={item.isActive ? "page" : undefined}
+                  className={`group relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1.5 text-[9px] font-semibold transition-all duration-200 ease-out active:scale-95 ${
+                    item.isActive
+                      ? "bg-gradient-to-b from-maroon to-maroon-dark text-white shadow-[0_2px_8px_-2px_rgba(122,31,43,0.4)]"
+                      : "text-charcoal/65 hover:bg-white/60 hover:text-maroon"
+                  }`}
+                >
+                  <span className="relative">
+                    <Icon
+                      size={16}
+                      className={
+                        item.isActive
+                          ? "drop-shadow-sm"
+                          : "transition duration-200 group-hover:scale-110"
+                      }
+                    />
+                    {item.badge && <CountBadge kind={item.badge} />}
+                  </span>
+                  <span className="leading-none">{item.label}</span>
+                </Link>
+              );
+            })}
+
+            <a
+              href={buildWhatsAppLink("Hello MKV Collection 🙏")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1.5 text-[9px] font-semibold text-[#1EA855] transition-all duration-200 ease-out hover:bg-[#25D366]/10 active:scale-95"
             >
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"
+              <MessageCircle
+                size={16}
+                className="transition duration-200 group-hover:scale-110"
               />
-
-              {[
-                {
-                  href: "/",
-                  icon: Home,
-                  label: "Home",
-                  isActive: pathname === "/",
-                },
-                {
-                  href: "/shop",
-                  icon: Search,
-                  label: "Shop",
-                  isActive: pathname.startsWith("/shop"),
-                },
-                {
-                  href: "/wishlist",
-                  icon: Heart,
-                  label: "Wishlist",
-                  isActive: pathname === "/wishlist",
-                  badge: "wishlist" as const,
-                },
-                {
-                  href: "/cart",
-                  icon: ShoppingBag,
-                  label: "Cart",
-                  isActive: pathname === "/cart",
-                  badge: "cart" as const,
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    aria-current={item.isActive ? "page" : undefined}
-                    className={`group relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1.5 text-[9px] font-semibold transition-all duration-200 ease-out active:scale-95 ${
-                      item.isActive
-                        ? "bg-gradient-to-b from-maroon to-maroon-dark text-white shadow-[0_2px_8px_-2px_rgba(122,31,43,0.4)]"
-                        : "text-charcoal/65 hover:bg-white/60 hover:text-maroon"
-                    }`}
-                  >
-                    <span className="relative">
-                      <Icon
-                        size={16}
-                        className={
-                          item.isActive
-                            ? "drop-shadow-sm"
-                            : "transition duration-200 group-hover:scale-110"
-                        }
-                      />
-                      {item.badge && <CountBadge kind={item.badge} />}
-                    </span>
-                    <span className="leading-none">{item.label}</span>
-                  </Link>
-                );
-              })}
-
-              <a
-                href={buildWhatsAppLink("Hello MKV Collection 🙏")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1.5 text-[9px] font-semibold text-[#1EA855] transition-all duration-200 ease-out hover:bg-[#25D366]/10 active:scale-95"
-              >
-                <MessageCircle
-                  size={16}
-                  className="transition duration-200 group-hover:scale-110"
-                />
-                <span className="leading-none">WhatsApp</span>
-              </a>
-            </nav>
-          </div>
-
-        </>
+              <span className="leading-none">WhatsApp</span>
+            </a>
+          </nav>
+        </div>
       )}
     </>
   );
