@@ -31,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main>{children}</main>
         <Footer />
-        <FloatingWhatsApp />
         </StoreProvider>
       </body>
     </html>
