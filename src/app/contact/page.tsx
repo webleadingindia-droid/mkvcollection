@@ -37,7 +37,7 @@ export default function ContactPage() {
                 intro="Hello MKV Collection 🙏 I have a question."
                 fields={[
                   { name: "Name", label: "Your name", required: true },
-                  { name: "Phone", label: "Phone number", type: "tel" },
+                  { name: "Phone", label: "Phone number", type: "tel", required: true },
                   { name: "Message", label: "Message", type: "textarea", required: true },
                 ]}
               />

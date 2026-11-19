@@ -2,8 +2,8 @@ export const BRAND_NAME = "MKV Collection";
 export const TAGLINE = "Small magnets, big smiles.";
 // Set real values in .env.local (see .env.example) or edit the fallbacks here.
 export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "919315330194"; // country code, no +
-export const EMAIL = process.env.NEXT_PUBLIC_EMAIL ?? "hello@mkvcollection.in";
-export const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "+91 XXXXX XXXXX";
+export const EMAIL = process.env.NEXT_PUBLIC_EMAIL ?? "mkvcollection8@gmail.com";
+export const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "+91 9315330194";
 export const ADDRESS = "MKV Collection, India";
 export const INSTAGRAM_URL = "https://instagram.com/mkvcollection";
 export const FACEBOOK_URL = "https://facebook.com/mkvcollection";
