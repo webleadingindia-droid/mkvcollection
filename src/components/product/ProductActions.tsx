@@ -51,7 +51,6 @@ export default function ProductActions({
   if (compact) {
     return (
       <div className="flex items-center gap-2">
-        {/* Quantity stepper */}
         <div className="flex items-center rounded-full border border-maroon/15 bg-white shadow-sm">
           <button
             type="button"
@@ -79,7 +78,6 @@ export default function ProductActions({
           </button>
         </div>
 
-        {/* WhatsApp */}
         <a
           href={buildWhatsAppLink(msg)}
           target="_blank"
@@ -90,7 +88,6 @@ export default function ProductActions({
           Order
         </a>
 
-        {/* Add to cart icon */}
         <button
           type="button"
           onClick={add}
@@ -110,12 +107,11 @@ export default function ProductActions({
   /* ============ FULL MODE ============ */
   return (
     <div className="mt-6 md:mt-8">
-      {/* ─── Premium card wrapper ─── */}
-      <div className="rounded-2xl border border-maroon/10 bg-gradient-to-b from-ivory to-cream/50 p-4 shadow-[0_8px_24px_-12px_rgba(122,31,43,0.12)] md:rounded-3xl md:p-5">
-        {/* Quantity + Total row */}
+      <div className="rounded-2xl border border-maroon/10 bg-gradient-to-b from-white via-ivory to-cream/40 p-4 shadow-[0_8px_28px_-12px_rgba(122,31,43,0.15)] md:rounded-3xl md:p-5">
+        {/* ─── Quantity row ─── */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-maroon/70">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-maroon/70">
               Qty
             </span>
             <div className="inline-flex items-center rounded-full border border-maroon/15 bg-white shadow-sm">
@@ -149,10 +145,10 @@ export default function ProductActions({
           {/* Live total */}
           {p.price > 0 && (
             <div className="text-right">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-charcoal/45">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal/45">
                 Total
               </p>
-              <p className="text-base font-bold text-maroon md:text-lg">
+              <p className="text-base font-bold tracking-tight text-maroon md:text-lg">
                 ₹{(p.price * qty).toLocaleString("en-IN")}
               </p>
             </div>
@@ -162,14 +158,14 @@ export default function ProductActions({
         {/* ─── Divider ─── */}
         <div className="my-4 h-px bg-gradient-to-r from-transparent via-maroon/15 to-transparent" />
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch">
-          {/* WhatsApp — primary CTA */}
+        {/* ─── CTA Buttons (Wishlist REMOVED from here) ─── */}
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          {/* WhatsApp — primary */}
           <a
             href={buildWhatsAppLink(msg)}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(37,211,102,0.5)] transition-all duration-200 hover:shadow-[0_12px_28px_-8px_rgba(37,211,102,0.6)] hover:brightness-105 active:scale-[0.98]"
+            className="group relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(37,211,102,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-8px_rgba(37,211,102,0.6)] hover:brightness-105 active:scale-[0.98]"
           >
             <MessageCircle size={17} />
             <span>Order on WhatsApp</span>
@@ -183,10 +179,10 @@ export default function ProductActions({
           <button
             type="button"
             onClick={add}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-full border-2 px-5 py-3 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-full border-2 px-5 py-3.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${
               added
-                ? "border-green-600 bg-green-50 text-green-700"
-                : "border-maroon/20 bg-white text-maroon hover:border-maroon/40 hover:bg-maroon/5"
+                ? "border-green-600 bg-green-50 text-green-700 shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)]"
+                : "border-maroon/20 bg-white text-maroon hover:border-maroon/40 hover:bg-maroon/5 hover:shadow-[0_8px_24px_-8px_rgba(122,31,43,0.2)]"
             }`}
           >
             {added ? (
@@ -204,18 +200,12 @@ export default function ProductActions({
               </>
             )}
           </button>
-
-          {/* Wishlist */}
-          <WishlistButton
-            id={p.id}
-            className="!h-auto !w-auto !rounded-full border-2 border-maroon/20 !bg-white px-5 transition hover:border-maroon/40 hover:!bg-maroon/5 sm:!h-full sm:!px-4"
-          />
         </div>
 
         {/* Trust helper */}
         <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-charcoal/50">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-marigold" />
-          No prepayment needed · Cash on delivery available
+          No prepayment · Cash on delivery available
         </p>
       </div>
 
