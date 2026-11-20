@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import {
-  ArrowLeft, ArrowRight, Check, Copy, Download, MessageCircle, ShoppingBag, Smartphone,
+  ArrowLeft, ArrowRight, Check, Copy, Download, MapPin, Loader2, MessageCircle, ShoppingBag, Smartphone,
 } from "lucide-react";
 import SafeImage from "@/components/ui/SafeImage";
 import { products } from "@/data/products";
@@ -60,8 +60,11 @@ export default function CheckoutFlow() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [copied, setCopied] = useState(false);
+  const [locBusy, setLocBusy] = useState(false);
+  const [locMsg, setLocMsg] = useState("");
   const receiptRef = useRef<HTMLDivElement>(null);
   const blobRef = useRef<Blob | null>(null);
+  const autoTriedRef = useRef(false);
 
   // Prefill saved details
   useEffect(() => {
@@ -97,6 +100,77 @@ export default function CheckoutFlow() {
     setInfo((s) => ({ ...s, [k]: val }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
+
+  // ---------- Current location -> auto-fill address ----------
+  // Only EMPTY fields are filled, so anything the user typed / saved is never overwritten.
+  const fillFromLocation = useCallback(() => {
+    setLocMsg("");
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setLocMsg("Aapka browser location support nahi karta. Address manually bharein.");
+      return;
+    }
+    setLocBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&lat=${latitude}&lon=${longitude}`,
+            { headers: { "Accept-Language": "en" } }
+          );
+          if (!res.ok) throw new Error("geocode failed");
+          const data = await res.json();
+          const a = data.address ?? {};
+
+          const street = [
+            a.house_number,
+            a.road,
+            a.neighbourhood || a.suburb || a.residential,
+            a.village,
+          ].filter(Boolean).join(", ");
+
+          const city = a.city || a.town || a.county || a.state_district || a.village || "";
+          const state = a.state || "";
+          const cityState = [city, state].filter(Boolean).join(", ");
+          const pincode = String(a.postcode ?? "").replace(/\D/g, "").slice(0, 6);
+
+          setInfo((s) => ({
+            ...s,
+            address: s.address.trim() ? s.address : (street || data.display_name || ""),
+            city: s.city.trim() ? s.city : cityState,
+            pincode: s.pincode.trim() ? s.pincode : pincode,
+          }));
+          setErrors((e) => ({ ...e, address: undefined, city: undefined, pincode: undefined }));
+          setLocMsg("Address fill ho gaya ✓ Kripya check karke house no / landmark add kar lein.");
+        } catch {
+          setLocMsg("Address nahi mil paya. Kripya manually bharein.");
+        } finally {
+          setLocBusy(false);
+        }
+      },
+      (err) => {
+        setLocBusy(false);
+        setLocMsg(
+          err.code === err.PERMISSION_DENIED
+            ? "Location permission deny ho gayi. Browser settings me allow karein ya address manually bharein."
+            : "Location nahi mil payi. Address manually bharein."
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
+
+  // If the user has ALREADY granted location earlier, fill automatically on page open (no popup).
+  // New users get the button instead, so we don't trigger an unwanted permission popup.
+  useEffect(() => {
+    if (autoTriedRef.current) return;
+    autoTriedRef.current = true;
+    if (typeof navigator === "undefined" || !navigator.permissions) return;
+    navigator.permissions
+      .query({ name: "geolocation" as PermissionName })
+      .then((r) => { if (r.state === "granted") fillFromLocation(); })
+      .catch(() => { /* ignore */ });
+  }, [fillFromLocation]);
 
   const goStep2 = () => {
     const e = validate(info);
@@ -261,6 +335,18 @@ export default function CheckoutFlow() {
         {step === 1 && (
           <form onSubmit={(e) => { e.preventDefault(); goStep2(); }} noValidate className="rounded-3xl border border-maroon/10 bg-white p-5 shadow-soft sm:p-8">
             <h2 className="font-heading text-xl font-bold text-maroon-dark">Basic information</h2>
+
+            <button
+              type="button"
+              onClick={fillFromLocation}
+              disabled={locBusy}
+              className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-2xl border border-maroon/20 bg-ivory/80 px-4 py-2 text-sm font-semibold text-maroon transition hover:bg-peach/60 disabled:opacity-60"
+            >
+              {locBusy ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
+              {locBusy ? "Taking the location…" : "Use my current location"}
+            </button>
+            {locMsg && <p className="mt-2 text-xs text-charcoal/70">{locMsg}</p>}
+
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {field("name", "Full name", { autoComplete: "name", placeholder: "Your name" })}
               {field("phone", "Mobile number", { type: "tel", inputMode: "numeric", autoComplete: "tel", placeholder: "10-digit number" })}
