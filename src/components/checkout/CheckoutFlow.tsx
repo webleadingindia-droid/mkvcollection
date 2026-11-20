@@ -44,6 +44,53 @@ function downloadBlob(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+
+// ---------- Location helpers ----------
+function getPosition(): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    const opts = (high: boolean): PositionOptions => ({
+      enableHighAccuracy: high, timeout: high ? 8000 : 12000, maximumAge: 60000,
+    });
+    // 1st try GPS (accurate); if it times out, retry with network location (fast, works indoors)
+    navigator.geolocation.getCurrentPosition(resolve, (err) => {
+      if (err.code === err.PERMISSION_DENIED) return reject(err);
+      navigator.geolocation.getCurrentPosition(resolve, reject, opts(false));
+    }, opts(true));
+  });
+}
+
+function distM(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371000, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Nearest named landmark (temple, school, bank, hospital, mall...) within 250 m via OpenStreetMap Overpass
+async function nearestLandmark(lat: number, lon: number): Promise<string> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 7000);
+  try {
+    const q =
+      `[out:json][timeout:6];(` +
+      `nwr(around:250,${lat},${lon})["name"]["amenity"~"place_of_worship|school|college|hospital|bank|marketplace|fuel|pharmacy|restaurant|cafe"];` +
+      `nwr(around:250,${lat},${lon})["name"]["shop"~"mall|supermarket"];` +
+      `);out center 25;`;
+    const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { signal: ctrl.signal });
+    if (!res.ok) return "";
+    const data = await res.json();
+    let best = "", bestD = Infinity;
+    for (const el of data.elements ?? []) {
+      const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
+      const name = el.tags?.name as string | undefined;
+      if (!name || la == null || lo == null) continue;
+      const d = distM(lat, lon, la, lo);
+      if (d < bestD) { bestD = d; best = name; }
+    }
+    return best;
+  } catch { return ""; } finally { clearTimeout(t); }
+}
+
 export default function CheckoutFlow() {
   const { ready, cart, clearCart } = useStore();
   // Buy Now mode: /checkout?buy=<productId>&qty=<n> -> only that product, cart stays untouched
@@ -65,6 +112,7 @@ export default function CheckoutFlow() {
   const receiptRef = useRef<HTMLDivElement>(null);
   const blobRef = useRef<Blob | null>(null);
   const autoTriedRef = useRef(false);
+  const touchedRef = useRef(false); // true once the user types in address/city/pincode
 
   // Prefill saved details
   useEffect(() => {
@@ -97,79 +145,91 @@ export default function CheckoutFlow() {
   }, [total, orderId]);
 
   const set = (k: keyof Info, val: string) => {
+    if (k === "address" || k === "city" || k === "pincode") touchedRef.current = true;
     setInfo((s) => ({ ...s, [k]: val }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
-  // ---------- Current location -> auto-fill address ----------
-  // Only EMPTY fields are filled, so anything the user typed / saved is never overwritten.
-  const fillFromLocation = useCallback(() => {
+  // ---------- Current location -> auto-fill FULL address (+ nearby landmark) ----------
+  // auto=true  : runs on page open. Overwrites saved/old address, but never what the user typed this session.
+  // auto=false : button tap. Always overwrites address, city and pincode.
+  const fillFromLocation = useCallback(async (auto = false) => {
     setLocMsg("");
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setLocMsg("Aapka browser location support nahi karta. Address manually bharein.");
+      if (!auto) setLocMsg("Aapka browser location support nahi karta. Address manually bharein.");
       return;
     }
     setLocBusy(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&lat=${latitude}&lon=${longitude}`,
-            { headers: { "Accept-Language": "en" } }
-          );
-          if (!res.ok) throw new Error("geocode failed");
-          const data = await res.json();
-          const a = data.address ?? {};
+    try {
+      const pos = await getPosition();
+      const { latitude, longitude } = pos.coords;
 
-          const street = [
-            a.house_number,
-            a.road,
-            a.neighbourhood || a.suburb || a.residential,
-            a.village,
-          ].filter(Boolean).join(", ");
+      const [geo, landmark] = await Promise.all([
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&namedetails=1&zoom=18&lat=${latitude}&lon=${longitude}`,
+          { headers: { "Accept-Language": "en" } }
+        ).then((r) => { if (!r.ok) throw new Error("geocode failed"); return r.json(); }),
+        nearestLandmark(latitude, longitude),
+      ]);
 
-          const city = a.city || a.town || a.county || a.state_district || a.village || "";
-          const state = a.state || "";
-          const cityState = [city, state].filter(Boolean).join(", ");
-          const pincode = String(a.postcode ?? "").replace(/\D/g, "").slice(0, 6);
+      const a = geo.address ?? {};
+      const parts = [
+        a.house_number,
+        a.building || a.amenity || a.shop || a.tourism,
+        a.road,
+        a.neighbourhood || a.suburb || a.residential || a.city_district || a.quarter,
+        a.village,
+      ].filter(Boolean) as string[];
+      // remove duplicates (case-insensitive)
+      const uniq = parts.filter((x, i) => parts.findIndex((y) => y.toLowerCase() === x.toLowerCase()) === i);
+      let street = uniq.join(", ");
+      if (!street && geo.display_name) street = String(geo.display_name).split(",").slice(0, 4).join(",").trim();
+      if (landmark && !street.toLowerCase().includes(landmark.toLowerCase())) {
+        street = street ? `${street}, Near ${landmark}` : `Near ${landmark}`;
+      }
 
-          setInfo((s) => ({
-            ...s,
-            address: s.address.trim() ? s.address : (street || data.display_name || ""),
-            city: s.city.trim() ? s.city : cityState,
-            pincode: s.pincode.trim() ? s.pincode : pincode,
-          }));
-          setErrors((e) => ({ ...e, address: undefined, city: undefined, pincode: undefined }));
-          setLocMsg("Address fill ho gaya ✓ Kripya check karke house no / landmark add kar lein.");
-        } catch {
-          setLocMsg("Address nahi mil paya. Kripya manually bharein.");
-        } finally {
-          setLocBusy(false);
-        }
-      },
-      (err) => {
-        setLocBusy(false);
-        setLocMsg(
-          err.code === err.PERMISSION_DENIED
-            ? "Location permission deny ho gayi. Browser settings me allow karein ya address manually bharein."
-            : "Location nahi mil payi. Address manually bharein."
-        );
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-    );
+      const city = a.city || a.town || a.village || a.county || a.state_district || "";
+      const cityState = [city, a.state].filter(Boolean).join(", ");
+      const pincode = String(a.postcode ?? "").replace(/\D/g, "").slice(0, 6);
+
+      const overwrite = !auto || !touchedRef.current;
+      setInfo((s) => ({
+        ...s,
+        address: overwrite || !s.address.trim() ? (street || s.address) : s.address,
+        city: overwrite || !s.city.trim() ? (cityState || s.city) : s.city,
+        pincode: overwrite || !s.pincode.trim() ? (pincode || s.pincode) : s.pincode,
+      }));
+      setErrors((e) => ({ ...e, address: undefined, city: undefined, pincode: undefined }));
+      setLocMsg("Address fill ho gaya ✓ Kripya check karke house / flat no add kar lein.");
+    } catch (err) {
+      const code = (err as GeolocationPositionError)?.code;
+      if (code === 1) {
+        setLocMsg("Location permission band hai. Browser/phone settings me site ke liye Location 'Allow' karein, phir button dabayein.");
+      } else if (code === 2 || code === 3) {
+        setLocMsg("Location nahi mil payi. GPS/Location ON karke button dabayein, ya address manually bharein.");
+      } else {
+        setLocMsg("Address nahi mil paya. Dubara try karein ya manually bharein.");
+      }
+    } finally {
+      setLocBusy(false);
+    }
   }, []);
 
-  // If the user has ALREADY granted location earlier, fill automatically on page open (no popup).
-  // New users get the button instead, so we don't trigger an unwanted permission popup.
+  // On page open: ask for location automatically (browser shows its Allow/Block popup).
+  // Skipped only if the user has already blocked it.
   useEffect(() => {
     if (autoTriedRef.current) return;
     autoTriedRef.current = true;
-    if (typeof navigator === "undefined" || !navigator.permissions) return;
-    navigator.permissions
-      .query({ name: "geolocation" as PermissionName })
-      .then((r) => { if (r.state === "granted") fillFromLocation(); })
-      .catch(() => { /* ignore */ });
+    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+    const run = () => { window.setTimeout(() => fillFromLocation(true), 500); };
+    if (navigator.permissions?.query) {
+      navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .then((r) => { if (r.state !== "denied") run(); })
+        .catch(run); // some mobile browsers (older iOS Safari) can't query -> just ask
+    } else {
+      run();
+    }
   }, [fillFromLocation]);
 
   const goStep2 = () => {
@@ -338,7 +398,7 @@ export default function CheckoutFlow() {
 
             <button
               type="button"
-              onClick={fillFromLocation}
+              onClick={() => fillFromLocation(false)}
               disabled={locBusy}
               className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-2xl border border-maroon/20 bg-ivory/80 px-4 py-2 text-sm font-semibold text-maroon transition hover:bg-peach/60 disabled:opacity-60"
             >
